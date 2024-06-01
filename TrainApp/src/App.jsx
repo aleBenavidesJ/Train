@@ -1,13 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, Grid, Tabs, Tab, Stack } from '@mui/material';
 import Flow from './components/Flow';
 import AdminFlow from './components/AdminFlow';
 
 const App = () => {
   const [tabIndex, setTabIndex] = useState(0);
+  const [data, setData] = useState({ nodes: [], edges: [] });
+
+  useEffect(() => {
+    const savedNodes = JSON.parse(localStorage.getItem('nodes')) || [];
+    const savedEdges = JSON.parse(localStorage.getItem('edges')) || [];
+    setData({ nodes: savedNodes, edges: savedEdges });
+  }, []);
 
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
+  };
+
+  const updateNodes = (newNodes) => {
+    setData((prevData) => ({
+      ...prevData,
+      nodes: newNodes,
+    }));
+    localStorage.setItem('nodes', JSON.stringify(newNodes));
+  };
+
+  const updateEdges = (newEdges) => {
+    setData((prevData) => ({
+      ...prevData,
+      edges: newEdges,
+    }));
+    localStorage.setItem('edges', JSON.stringify(newEdges));
   };
 
   return (
@@ -22,9 +45,16 @@ const App = () => {
       </Stack>
       <Grid container spacing={8} height='100%'>
         <Grid item xs={8}>
-          {tabIndex === 0 && <Flow data={Data} />}
-          {tabIndex === 1 && <AdminFlow data={Data} />}
+          {tabIndex === 0 && <Flow data={data} />}
+          {tabIndex === 1 && (
+            <AdminFlow
+              data={data}
+              updateNodes={updateNodes}
+              updateEdges={updateEdges}
+            />
+          )}
           {tabIndex === 2 && <Typography variant="h6">Contenido de otra pestaña</Typography>}
+          {tabIndex === 3 && <Typography variant="h6">zzzzzz</Typography>}
         </Grid>
         <Grid item xs={4}>
           <Tabs
@@ -36,38 +66,13 @@ const App = () => {
           >
             <Tab label="Mapa de Rutas" />
             <Tab label="Administrar Rutas" />
-            <Tab label="Otra Pestaña" />
+            <Tab label="Comprar tiquetes" />
+            <Tab label="Visualizar reservaciones" />
           </Tabs>
         </Grid>
       </Grid>
-      {/* <Box sx={{ display: 'grid', gridTemplateColumns: '8fr 4fr', gap: 2, padding: 2 }}>
-        <Tabs
-          value={tabIndex}
-          onChange={handleTabChange}
-          orientation="vertical"
-          variant="scrollable"
-          scrollButtons="auto"
-          aria-label="vertical tabs"
-        >
-          <Tab label="Mapa de Rutas" />
-          <Tab label="Otra Pestaña" />
-        </Tabs>
-        <Box>
-          {tabIndex === 0 && <Flow />}
-          {tabIndex === 1 && <Typography variant="h6">Contenido de otra pestaña</Typography>}
-        </Box>
-      </Box> */}
     </Stack>
   );
 };
 
 export default App;
-
-const Data = {
-  nodes: [
-    
-  ],
-  edges: [
-    
-  ]
-}

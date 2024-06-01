@@ -4,9 +4,9 @@ import React from 'react';
 import ReactFlow, { MiniMap, Controls, Background } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-const AdminFlow = ({ data }) => {
-  const [nodes, setNodes] = useState([]);
-  const [edges, setEdges] = useState([]);
+const AdminFlow = ({ data, updateNodes, updateEdges }) => {
+  const [nodes, setNodes] = useState(data.nodes);
+  const [edges, setEdges] = useState(data.edges);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -15,25 +15,13 @@ const AdminFlow = ({ data }) => {
   const [distancia, setDistancia] = useState('');
   const [x, setX] = useState('');
   const [y, setY] = useState('');
-  const [nextEdgeId, setNextEdgeId] = useState(1);
-  const [nextNodeId, setNextNodeId] = useState(1);
+  const [nextEdgeId, setNextEdgeId] = useState(edges.length + 1);
+  const [nextNodeId, setNextNodeId] = useState(nodes.length + 1);
 
   useEffect(() => {
-    const savedNodes = JSON.parse(localStorage.getItem('nodes')) || data.nodes;
-    const savedEdges = JSON.parse(localStorage.getItem('edges')) || data.edges;
-    setNodes(savedNodes);
-    setEdges(savedEdges);
-    setNextNodeId(savedNodes.length + 1);
-    setNextEdgeId(savedEdges.length + 1);
-  }, [data.nodes, data.edges]);
-
-  useEffect(() => {
-    localStorage.setItem('nodes', JSON.stringify(nodes));
-  }, [nodes]);
-
-  useEffect(() => {
-    localStorage.setItem('edges', JSON.stringify(edges));
-  }, [edges]);
+    setNodes(data.nodes);
+    setEdges(data.edges);
+  }, [data]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -68,7 +56,7 @@ const AdminFlow = ({ data }) => {
 
     if (!targetNode) {
       targetNode = {
-        id: (nextNodeId + 1).toString(), 
+        id: (nextNodeId + 1).toString(),
         position: { x: parseFloat(x) + 100, y: parseFloat(y) + 100 },
         data: { label: hacia },
       };
@@ -77,7 +65,7 @@ const AdminFlow = ({ data }) => {
     }
 
     const newEdge = { id: `e${nextEdgeId}`, source: sourceNode.id, target: targetNode.id, distance: distancia };
-    
+
     newEdges.push(newEdge);
     setNextEdgeId(nextEdgeId + 1);
     setNodes(newNodes);
@@ -87,13 +75,16 @@ const AdminFlow = ({ data }) => {
     setDistancia('');
     setX('');
     setY('');
+
+    updateNodes(newNodes);  // Actualizamos los nodos en App
+    updateEdges(newEdges);  // Actualizamos los bordes en App
   };
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, edges.length - page * rowsPerPage);
 
   return (
     <Grid container direction="row" sx={{ height: '100vh' }}>
-      <Grid item xs={25} sx={{ bgcolor: 'white', padding: 2 }}>
+      <Grid item xs={12} sx={{ bgcolor: 'white', padding: 2 }}>
         <Box sx={{ mb: 2 }}>
           <Box sx={{ width: '100%', height: '300px', backgroundColor: '#1B1B1B', mb: 2 }}>
             <ReactFlow
