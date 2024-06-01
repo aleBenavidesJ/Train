@@ -1,0 +1,14 @@
+*, *::after, *:before {
+  box-sizing: border-box;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+body {
+  height: 100vh;
+  margin: 0;
+  background-color: #FFFAFA;
+}
+
+#root {
+  height: 100%;
+}
