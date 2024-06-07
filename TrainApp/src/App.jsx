@@ -2,10 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, Grid, Tabs, Tab, Stack } from '@mui/material';
 import Flow from './components/Flow';
 import AdminFlow from './components/AdminFlow';
+import LoginFlow from './components/LoginFlow';
+import RegisterFlow from './components/RegisterFlow';
 
 const App = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const [data, setData] = useState({ nodes: [], edges: [] });
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [view, setView] = useState('home');
 
   useEffect(() => {
     const savedNodes = JSON.parse(localStorage.getItem('nodes')) || [];
@@ -33,15 +37,38 @@ const App = () => {
     localStorage.setItem('edges', JSON.stringify(newEdges));
   };
 
+  const handleLogin = () => {
+    setView('login');
+  };
+
+  const handleRegister = () => {
+    setView('register');
+  };
+
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
+    setView('home');
+  };
+
+  const handleBackToHome = () => {
+    setView('home');
+  };
+
+  if (view === 'login') {
+    return <LoginFlow onLoginSuccess={handleLoginSuccess} onBackToHome={handleBackToHome} onRegister={handleRegister} />;
+  }
+
+  if (view === 'register') {
+    return <RegisterFlow onBackToHome={handleBackToHome} onLogin={handleLogin} />;
+  }
+
   return (
     <Stack p={4} gap={4} height='100%'>
       <Stack direction='row' justifyContent='space-between' p={1}>
         <Typography variant='h4'>
           Train App
         </Typography>
-        <Button variant='contained'>
-          Login
-        </Button>
+        {!isLoggedIn && <Button variant='contained' onClick={handleLogin}>Login</Button>}
       </Stack>
       <Grid container spacing={8} height='100%'>
         <Grid item xs={8}>

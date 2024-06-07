@@ -76,8 +76,8 @@ const AdminFlow = ({ data, updateNodes, updateEdges }) => {
     setX('');
     setY('');
 
-    updateNodes(newNodes);  // Actualizamos los nodos en App
-    updateEdges(newEdges);  // Actualizamos los bordes en App
+    updateNodes(newNodes);
+    updateEdges(newEdges);
   };
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, edges.length - page * rowsPerPage);
