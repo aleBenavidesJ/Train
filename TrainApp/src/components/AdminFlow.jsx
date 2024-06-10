@@ -1,5 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, TextField, Button, Box } from '@mui/material';
+import {
+  Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+  Paper, TablePagination, TextField, Button, Box, IconButton
+} from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import React from 'react';
 import ReactFlow, { MiniMap, Controls, Background } from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -76,6 +81,40 @@ const AdminFlow = ({ data, updateNodes, updateEdges }) => {
     setX('');
     setY('');
 
+    updateNodes(newNodes);
+    updateEdges(newEdges);
+  };
+
+  const handleEditEdge = (edgeId) => {
+    const edge = edges.find((e) => e.id === edgeId);
+    if (!edge) return;
+
+    const sourceNode = nodes.find((node) => node.id === edge.source);
+    const targetNode = nodes.find((node) => node.id === edge.target);
+
+    setDesde(sourceNode ? sourceNode.data.label : '');
+    setHacia(targetNode ? targetNode.data.label : '');
+    setDistancia(edge.distance);
+  };
+
+  const handleDeleteEdge = (edgeId) => {
+    const newEdges = edges.filter((edge) => edge.id !== edgeId);
+    const edgeToDelete = edges.find((edge) => edge.id === edgeId);
+
+    const sourceNode = nodes.find((node) => node.id === edgeToDelete.source);
+    const targetNode = nodes.find((node) => node.id === edgeToDelete.target);
+
+    const isSourceConnectedToOthers = newEdges.some((e) => e.source === sourceNode.id || e.target === sourceNode.id);
+    const isTargetConnectedToOthers = newEdges.some((e) => e.source === targetNode.id || e.target === targetNode.id);
+
+    const newNodes = nodes.filter((node) => {
+      const isSource = edgeToDelete.source === node.id;
+      const isTarget = edgeToDelete.target === node.id;
+      return !((isSource && !isSourceConnectedToOthers) || (isTarget && !isTargetConnectedToOthers));
+    });
+
+    setEdges(newEdges);
+    setNodes(newNodes);
     updateNodes(newNodes);
     updateEdges(newEdges);
   };
@@ -163,6 +202,7 @@ const AdminFlow = ({ data, updateNodes, updateEdges }) => {
                   <TableCell sx={{ fontWeight: 'bold' }}>Desde</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Hacia</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Distancia</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Acciones</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -172,11 +212,19 @@ const AdminFlow = ({ data, updateNodes, updateEdges }) => {
                     <TableCell>{getNodeLabel(edge.source)}</TableCell>
                     <TableCell>{getNodeLabel(edge.target)}</TableCell>
                     <TableCell>{edge.distance}</TableCell>
+                    <TableCell>
+                      <IconButton onClick={() => handleEditEdge(edge.id)}>
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton onClick={() => handleDeleteEdge(edge.id)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
                   </TableRow>
                 ))}
                 {emptyRows > 0 && (
                   <TableRow style={{ height: 53 * emptyRows }}>
-                    <TableCell colSpan={4} />
+                    <TableCell colSpan={5} />
                   </TableRow>
                 )}
               </TableBody>

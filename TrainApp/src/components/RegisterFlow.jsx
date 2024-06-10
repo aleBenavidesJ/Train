@@ -7,7 +7,6 @@ const RegisterFlow = ({ onBackToHome, onLogin }) => {
 
   const handleRegister = (event) => {
     event.preventDefault();
-    // Lógica para el registro (puedes agregar tu lógica aquí)
     console.log('Cedula:', cedula);
     console.log('Password:', password);
     alert('Account created!');

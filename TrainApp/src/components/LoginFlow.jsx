@@ -7,8 +7,7 @@ const LoginFlow = ({ onLoginSuccess, onBackToHome, onRegister }) => {
 
   const handleLogin = (event) => {
     event.preventDefault();
-    // Lógica para el login (puedes agregar tu lógica aquí)
-    if (cedula === '123456789' && password === 'password') { // Ejemplo de validación simple
+    if (cedula === '123456789' && password === 'password') { 
       onLoginSuccess();
     } else {
       alert('Invalid credentials');
