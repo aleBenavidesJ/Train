@@ -4,6 +4,7 @@ import Flow from './components/Flow';
 import AdminFlow from './components/AdminFlow';
 import LoginFlow from './components/LoginFlow';
 import RegisterFlow from './components/RegisterFlow';
+import BoleteriaFlow from './components/BoleteriaFlow';
 
 const App = () => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -80,7 +81,12 @@ const App = () => {
               updateEdges={updateEdges}
             />
           )}
-          {tabIndex === 2 && <Typography variant="h6">Contenido de otra pestaña</Typography>}
+          {tabIndex === 2 && (
+            <div>
+              <Typography variant="h6">Comprar Boletos</Typography>
+              <BoleteriaFlow />
+            </div>
+          )}
           {tabIndex === 3 && <Typography variant="h6">zzzzzz</Typography>}
         </Grid>
         <Grid item xs={4}>
