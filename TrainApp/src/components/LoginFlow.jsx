@@ -1,3 +1,4 @@
+// LoginFlow.jsx
 import React from 'react';
 import { Box, Button, TextField, Typography, Link, Grid } from '@mui/material';
 
@@ -7,10 +8,15 @@ const LoginFlow = ({ onLoginSuccess, onBackToHome, onRegister }) => {
 
   const handleLogin = (event) => {
     event.preventDefault();
-    if (cedula === '123456789' && password === 'password') { 
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const admins = JSON.parse(localStorage.getItem('admins')) || [];
+    const validUser = users.find(user => user.cedula === cedula && user.password === password);
+    const validAdmin = admins.find(admin => admin.cedula === cedula && admin.contrasena === password);
+
+    if (validUser || validAdmin) {
       onLoginSuccess();
     } else {
-      alert('Invalid credentials');
+      alert('Cédula o contraseña incorrectos');
     }
   };
 

@@ -1,3 +1,4 @@
+// RegisterFlow.jsx
 import React from 'react';
 import { Box, Button, TextField, Typography, Link, Grid } from '@mui/material';
 
@@ -7,9 +8,24 @@ const RegisterFlow = ({ onBackToHome, onLogin }) => {
 
   const handleRegister = (event) => {
     event.preventDefault();
-    console.log('Cedula:', cedula);
-    console.log('Password:', password);
-    alert('Account created!');
+    
+    const cedulaRegex = /^[0-9]+$/;
+    if (!cedulaRegex.test(cedula)) {
+      alert('Cédula inválida. Debe contener solo números.');
+      return;
+    }
+    if (password.length < 6) {
+      alert('Contraseña muy corta. Debe tener al menos 6 caracteres.');
+      return;
+    }
+
+    const newUser = { cedula, password };
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    users.push(newUser);
+    localStorage.setItem('users', JSON.stringify(users));
+
+    alert('Cuenta creada exitosamente.');
+    onLogin();
   };
 
   return (

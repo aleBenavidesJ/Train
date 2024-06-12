@@ -23,9 +23,16 @@ const AdminFlow = ({ data, updateNodes, updateEdges }) => {
   const [nextEdgeId, setNextEdgeId] = useState(edges.length + 1);
   const [nextNodeId, setNextNodeId] = useState(nodes.length + 1);
 
+  const [cedula, setCedula] = useState('');
+  const [contrasena, setContrasena] = useState('');
+  const [admins, setAdmins] = useState([]);
+
   useEffect(() => {
     setNodes(data.nodes);
     setEdges(data.edges);
+
+    const storedAdmins = JSON.parse(localStorage.getItem('admins')) || [];
+    setAdmins(storedAdmins);
   }, [data]);
 
   const handleChangePage = (event, newPage) => {
@@ -117,6 +124,24 @@ const AdminFlow = ({ data, updateNodes, updateEdges }) => {
     setNodes(newNodes);
     updateNodes(newNodes);
     updateEdges(newEdges);
+  };
+
+  const handleAddAdmin = () => {
+    if (!cedula || !contrasena) return;
+
+    const newAdmin = { id: admins.length + 1, cedula, contrasena };
+    const updatedAdmins = [...admins, newAdmin];
+    setAdmins(updatedAdmins);
+    localStorage.setItem('admins', JSON.stringify(updatedAdmins));
+
+    setCedula('');
+    setContrasena('');
+  };
+
+  const handleDeleteAdmin = (adminId) => {
+    const updatedAdmins = admins.filter((admin) => admin.id !== adminId);
+    setAdmins(updatedAdmins);
+    localStorage.setItem('admins', JSON.stringify(updatedAdmins));
   };
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, edges.length - page * rowsPerPage);
@@ -240,6 +265,53 @@ const AdminFlow = ({ data, updateNodes, updateEdges }) => {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
+        <Box sx={{ mt: 4 }}>
+          <TextField
+            label="Cédula"
+            value={cedula}
+            onChange={(e) => setCedula(e.target.value)}
+            fullWidth
+            margin="normal"
+            type="number"
+          />
+          <TextField
+            label="Contraseña"
+            value={contrasena}
+            onChange={(e) => setContrasena(e.target.value)}
+            fullWidth
+            margin="normal"
+            type="password"
+          />
+          <Button variant="contained" onClick={handleAddAdmin} fullWidth>
+            Agregar Administrador
+          </Button>
+        </Box>
+        <TableContainer component={Paper} sx={{ mt: 4 }}>
+          <Table stickyHeader>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 'bold' }}>ID</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Cédula</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Contraseña</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Acciones</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {admins.map((admin) => (
+                <TableRow key={admin.id}>
+                  <TableCell>{admin.id}</TableCell>
+                  <TableCell>{admin.cedula}</TableCell>
+                  <TableCell>{admin.contrasena}</TableCell>
+                  <TableCell>
+                    <IconButton onClick={() => handleDeleteAdmin(admin.id)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Grid>
     </Grid>
   );

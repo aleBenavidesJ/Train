@@ -51,6 +51,11 @@ const App = () => {
     setView('home');
   };
 
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setView('home');
+  };
+
   const handleBackToHome = () => {
     setView('home');
   };
@@ -69,7 +74,16 @@ const App = () => {
         <Typography variant='h4'>
           Train App
         </Typography>
-        {!isLoggedIn && <Button variant='contained' onClick={handleLogin}>Login</Button>}
+        <Box>
+          <Button variant='contained' onClick={handleLogin} sx={{ mr: 2 }}>
+            Login
+          </Button>
+          {isLoggedIn && (
+            <Button variant='contained' onClick={handleLogout} sx={{ bgcolor: 'red', '&:hover': { bgcolor: 'darkred' } }}>
+              Log Out
+            </Button>
+          )}
+        </Box>
       </Stack>
       <Grid container spacing={8} height='100%'>
         <Grid item xs={8}>
