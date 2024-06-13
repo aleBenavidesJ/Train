@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration; // Agregado
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
@@ -14,9 +15,22 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
 });
 
+// Acceder a la configuración directamente desde el builder
+var configuration = builder.Configuration;
+
+builder.Services.AddCors(opciones =>
+{
+    var frontendURL = configuration.GetValue<string>("frontend_url");
+    opciones.AddDefaultPolicy(builder =>
+    {
+        builder.WithOrigins(frontendURL)
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+
 // Register your services
 builder.Services.AddScoped<IReservacionService, ReservacionService>();
-builder.Services.AddScoped<IRutaService, RutaService>();
 builder.Services.AddScoped<ITiqueteService, TiqueteService>();
 builder.Services.AddScoped<IDijkstraService, DijkstraService>();
 
@@ -44,6 +58,7 @@ else
     app.UseExceptionHandler("/error"); // Manejo de errores en producción
 }
 
+app.UseCors(); // Habilitar CORS
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthorization();

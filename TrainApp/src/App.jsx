@@ -5,6 +5,7 @@ import AdminFlow from './components/AdminFlow';
 import LoginFlow from './components/LoginFlow';
 import RegisterFlow from './components/RegisterFlow';
 import BoleteriaFlow from './components/BoleteriaFlow';
+import axios from 'axios';
 
 const App = () => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -16,6 +17,13 @@ const App = () => {
     const savedNodes = JSON.parse(localStorage.getItem('nodes')) || [];
     const savedEdges = JSON.parse(localStorage.getItem('edges')) || [];
     setData({ nodes: savedNodes, edges: savedEdges });
+    axios.get("http://localhost:5034/api/Ruta")
+      .then((respuesta) => {
+        console.log(respuesta.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
   }, []);
 
   const handleTabChange = (event, newValue) => {
@@ -101,7 +109,7 @@ const App = () => {
               <BoleteriaFlow />
             </div>
           )}
-          {tabIndex === 3 && <Typography variant="h6">zzzzzz</Typography>}
+          {tabIndex === 3 && <Typography variant="h6">Visualizar reservaciones</Typography>}
         </Grid>
         <Grid item xs={4}>
           <Tabs
