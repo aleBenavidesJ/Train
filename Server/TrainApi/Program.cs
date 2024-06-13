@@ -18,6 +18,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddScoped<IReservacionService, ReservacionService>();
 builder.Services.AddScoped<IRutaService, RutaService>();
 builder.Services.AddScoped<ITiqueteService, TiqueteService>();
+builder.Services.AddScoped<IDijkstraService, DijkstraService>();
 
 var app = builder.Build();
 
