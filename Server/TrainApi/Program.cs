@@ -20,6 +20,9 @@ builder.Services.AddScoped<IRutaService, RutaService>();
 builder.Services.AddScoped<ITiqueteService, TiqueteService>();
 builder.Services.AddScoped<IDijkstraService, DijkstraService>();
 
+// Aquí se corrige el registro de IRutaService
+builder.Services.AddSingleton<IRutaService, RutaService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

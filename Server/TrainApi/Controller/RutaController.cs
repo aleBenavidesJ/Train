@@ -17,7 +17,8 @@ public class RutaController : ControllerBase
     [HttpGet]
     public ActionResult<IEnumerable<Ruta>> GetRutas()
     {
-        return Ok(_rutaService.GetRutas());
+        var rutas = _rutaService.GetRutas();
+        return Ok(rutas);
     }
 
     [HttpPost]

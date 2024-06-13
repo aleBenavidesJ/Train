@@ -1,9 +1,16 @@
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
 
 public class RutaService : IRutaService
 {
     private readonly List<Ruta> _rutas = new List<Ruta>();
+    private readonly ILogger<RutaService> _logger;
+
+    public RutaService(ILogger<RutaService> logger)
+    {
+        _logger = logger;
+    }
 
     public IEnumerable<Ruta> GetRutas()
     {
@@ -13,6 +20,7 @@ public class RutaService : IRutaService
     public void AddRuta(Ruta ruta)
     {
         _rutas.Add(ruta);
+        _logger.LogInformation($"Se agregó una nueva ruta: {ruta.PuntoInicio} - {ruta.PuntoFinal}");
     }
 
     public void UpdateRuta(int id, Ruta ruta)
@@ -23,6 +31,7 @@ public class RutaService : IRutaService
             existingRuta.PuntoInicio = ruta.PuntoInicio;
             existingRuta.PuntoFinal = ruta.PuntoFinal;
             existingRuta.Distancia = ruta.Distancia;
+            _logger.LogInformation($"Se actualizó la ruta con ID {id}");
         }
     }
 
@@ -32,6 +41,7 @@ public class RutaService : IRutaService
         if (ruta != null)
         {
             _rutas.Remove(ruta);
+            _logger.LogInformation($"Se eliminó la ruta con ID {id}");
         }
     }
 }
