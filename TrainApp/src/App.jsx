@@ -5,6 +5,7 @@ import AdminFlow from './components/AdminFlow';
 import LoginFlow from './components/LoginFlow';
 import RegisterFlow from './components/RegisterFlow';
 import BoleteriaFlow from './components/BoleteriaFlow';
+import Reservaciones from './components/Reservaciones';
 import axios from 'axios';
 
 const App = () => {
@@ -21,7 +22,7 @@ const App = () => {
     setData({ nodes: savedNodes, edges: savedEdges });
     axios.get("http://localhost:5034/api/Ruta")
       .then((respuesta) => {
-        console.log(respuesta.data);
+        setConnections(respuesta.data);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
@@ -29,9 +30,9 @@ const App = () => {
   }, []);
 
   const handleTabChange = (event, newValue) => {
-    if ((userType === 'admin' && (newValue === 0 || newValue === 1 || newValue === 3)) || 
-        (userType === 'user' && (newValue === 0 || newValue === 2)) || 
-        (!isLoggedIn && newValue === 0)) {
+    if ((userType === 'admin' && (newValue === 0 || newValue === 1 || newValue === 2 || newValue === 3)) ||
+      (userType === 'user' && (newValue === 0 || newValue === 2)) ||
+      (!isLoggedIn && newValue === 0)) {
       setTabIndex(newValue);
     }
   };
@@ -64,19 +65,19 @@ const App = () => {
     setIsLoggedIn(true);
     setUserType(type);
     setView('home');
-    setTabIndex(0); 
+    setTabIndex(0);
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
     setUserType(null);
     setView('home');
-    setTabIndex(0); 
+    setTabIndex(0);
   };
 
   const handleBackToHome = () => {
     setView('home');
-    setTabIndex(0); 
+    setTabIndex(0);
   };
 
   if (view === 'login') {
@@ -115,14 +116,14 @@ const App = () => {
               setConnections={setConnections}
             />
           )}
-          {isLoggedIn && userType === 'user' && tabIndex === 2 && (
+          {isLoggedIn && (userType === 'user' || userType === 'admin') && tabIndex === 2 && (
             <div>
               <Typography variant="h6">Comprar Boletos</Typography>
-              <BoleteriaFlow connections={connections} />
+              <BoleteriaFlow nodes={data.nodes} edges={data.edges} connections={connections} />
             </div>
           )}
           {isLoggedIn && userType === 'admin' && tabIndex === 3 && (
-            <Typography variant="h6">zzzzzz</Typography>
+            <Reservaciones />
           )}
         </Grid>
         <Grid item xs={4}>
@@ -135,7 +136,7 @@ const App = () => {
           >
             <Tab label="Mapa de Rutas" value={0} />
             {isLoggedIn && userType === 'admin' && <Tab label="Administrar Rutas" value={1} />}
-            {isLoggedIn && userType === 'user' && <Tab label="Comprar boletos" value={2} />}
+            {isLoggedIn && (userType === 'user' || userType === 'admin') && <Tab label="Comprar boletos" value={2} />}
             {isLoggedIn && userType === 'admin' && <Tab label="Visualizar reservaciones" value={3} />}
           </Tabs>
         </Grid>

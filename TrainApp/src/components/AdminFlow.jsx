@@ -84,7 +84,7 @@ const AdminFlow = ({ data, updateNodes, updateEdges, setConnections }) => {
       setNextNodeId(nextNodeId + 2);
     }
 
-    const newEdge = { id: `e${nextEdgeId}`, source: sourceNode.id, target: targetNode.id, distance: distancia };
+    const newEdge = { id: `e${nextEdgeId}`, source: sourceNode.id, target: targetNode.id, distance: parseFloat(distancia) };
 
     newEdges.push(newEdge);
     setNextEdgeId(nextEdgeId + 1);

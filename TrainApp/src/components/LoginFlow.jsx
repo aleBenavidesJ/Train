@@ -13,8 +13,10 @@ const LoginFlow = ({ onLoginSuccess, onBackToHome, onRegister }) => {
     const validAdmin = admins.find(admin => admin.cedula === cedula && admin.contrasena === password);
 
     if (validUser) {
+      localStorage.setItem('cedula', cedula);
       onLoginSuccess('user');
     } else if (validAdmin) {
+      localStorage.setItem('cedula', cedula);
       onLoginSuccess('admin');
     } else {
       alert('Cédula o contraseña incorrectos');
