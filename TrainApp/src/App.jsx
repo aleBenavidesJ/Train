@@ -12,6 +12,8 @@ const App = () => {
   const [data, setData] = useState({ nodes: [], edges: [] });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [view, setView] = useState('home');
+  const [userType, setUserType] = useState(null);
+  const [connections, setConnections] = useState([]);
 
   useEffect(() => {
     const savedNodes = JSON.parse(localStorage.getItem('nodes')) || [];
@@ -27,7 +29,11 @@ const App = () => {
   }, []);
 
   const handleTabChange = (event, newValue) => {
-    setTabIndex(newValue);
+    if ((userType === 'admin' && (newValue === 0 || newValue === 1 || newValue === 3)) || 
+        (userType === 'user' && (newValue === 0 || newValue === 2)) || 
+        (!isLoggedIn && newValue === 0)) {
+      setTabIndex(newValue);
+    }
   };
 
   const updateNodes = (newNodes) => {
@@ -54,18 +60,23 @@ const App = () => {
     setView('register');
   };
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = (type) => {
     setIsLoggedIn(true);
+    setUserType(type);
     setView('home');
+    setTabIndex(0); 
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
+    setUserType(null);
     setView('home');
+    setTabIndex(0); 
   };
 
   const handleBackToHome = () => {
     setView('home');
+    setTabIndex(0); 
   };
 
   if (view === 'login') {
@@ -96,20 +107,23 @@ const App = () => {
       <Grid container spacing={8} height='100%'>
         <Grid item xs={8}>
           {tabIndex === 0 && <Flow data={data} />}
-          {tabIndex === 1 && (
+          {isLoggedIn && userType === 'admin' && tabIndex === 1 && (
             <AdminFlow
               data={data}
               updateNodes={updateNodes}
               updateEdges={updateEdges}
+              setConnections={setConnections}
             />
           )}
-          {tabIndex === 2 && (
+          {isLoggedIn && userType === 'user' && tabIndex === 2 && (
             <div>
               <Typography variant="h6">Comprar Boletos</Typography>
-              <BoleteriaFlow />
+              <BoleteriaFlow connections={connections} />
             </div>
           )}
-          {tabIndex === 3 && <Typography variant="h6">Visualizar reservaciones</Typography>}
+          {isLoggedIn && userType === 'admin' && tabIndex === 3 && (
+            <Typography variant="h6">zzzzzz</Typography>
+          )}
         </Grid>
         <Grid item xs={4}>
           <Tabs
@@ -119,10 +133,10 @@ const App = () => {
             variant="scrollable"
             scrollButtons="auto"
           >
-            <Tab label="Mapa de Rutas" />
-            <Tab label="Administrar Rutas" />
-            <Tab label="Comprar tiquetes" />
-            <Tab label="Visualizar reservaciones" />
+            <Tab label="Mapa de Rutas" value={0} />
+            {isLoggedIn && userType === 'admin' && <Tab label="Administrar Rutas" value={1} />}
+            {isLoggedIn && userType === 'user' && <Tab label="Comprar boletos" value={2} />}
+            {isLoggedIn && userType === 'admin' && <Tab label="Visualizar reservaciones" value={3} />}
           </Tabs>
         </Grid>
       </Grid>

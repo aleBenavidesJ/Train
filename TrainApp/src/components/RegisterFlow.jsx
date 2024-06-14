@@ -1,4 +1,3 @@
-// RegisterFlow.jsx
 import React from 'react';
 import { Box, Button, TextField, Typography, Link, Grid } from '@mui/material';
 

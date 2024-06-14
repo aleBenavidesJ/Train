@@ -1,18 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, Button, Box, MenuItem } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
-const BoleteriaFlow = () => {
+const BoleteriaFlow = ({ connections }) => {
   const [desde, setDesde] = useState('');
   const [hacia, setHacia] = useState('');
   const [fecha, setFecha] = useState(null);
   const [cantidad, setCantidad] = useState(0);
 
-  const estaciones = ['Estación 1', 'Estación 2', 'Estación 3'];
+  const [sourceNodes, setSourceNodes] = useState([]);
+  const [targetNodes, setTargetNodes] = useState([]);
 
-  const handleComprar = () => {
-    console.log('Comprar boletos:', { desde, hacia, fecha, cantidad });
+  useEffect(() => {
+    if (connections && connections.length > 0) {
+      setSourceNodes([...new Set(connections.map(connection => connection.source))]);
+    }
+  }, [connections]);
+
+  useEffect(() => {
+    if (desde) {
+      setTargetNodes(connections.filter(connection => connection.source === desde).map(connection => connection.target));
+    } else {
+      setTargetNodes([]);
+    }
+  }, [desde, connections]);
+
+  const handleAddTickets = () => {
+    console.log('Agregar boletos:', { desde, hacia, fecha, cantidad });
   };
 
   return (
@@ -21,13 +36,16 @@ const BoleteriaFlow = () => {
         select
         label="Desde"
         value={desde}
-        onChange={(e) => setDesde(e.target.value)}
+        onChange={(e) => {
+          setDesde(e.target.value);
+          setHacia('');
+        }}
         fullWidth
         margin="normal"
       >
-        {estaciones.map((estacion) => (
-          <MenuItem key={estacion} value={estacion}>
-            {estacion}
+        {sourceNodes.map((node) => (
+          <MenuItem key={node} value={node}>
+            {node}
           </MenuItem>
         ))}
       </TextField>
@@ -38,10 +56,11 @@ const BoleteriaFlow = () => {
         onChange={(e) => setHacia(e.target.value)}
         fullWidth
         margin="normal"
+        disabled={!desde}
       >
-        {estaciones.map((estacion) => (
-          <MenuItem key={estacion} value={estacion}>
-            {estacion}
+        {targetNodes.map((node) => (
+          <MenuItem key={node} value={node}>
+            {node}
           </MenuItem>
         ))}
       </TextField>
@@ -64,8 +83,8 @@ const BoleteriaFlow = () => {
           inputProps: { min: 0 },
         }}
       />
-      <Button variant="contained" color="primary" onClick={handleComprar} fullWidth>
-        Comprar
+      <Button variant="contained" color="primary" onClick={handleAddTickets} fullWidth>
+        Agregar al carrito
       </Button>
     </Box>
   );
