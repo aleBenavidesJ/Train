@@ -1,15 +1,14 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   Paper, TablePagination, TextField, Button, Box, IconButton
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import React from 'react';
 import ReactFlow, { MiniMap, Controls, Background } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-const AdminFlow = ({ data, updateNodes, updateEdges }) => {
+const AdminFlow = ({ data, updateNodes, updateEdges, setConnections }) => {
   const [nodes, setNodes] = useState(data.nodes);
   const [edges, setEdges] = useState(data.edges);
   const [page, setPage] = useState(0);
@@ -34,6 +33,15 @@ const AdminFlow = ({ data, updateNodes, updateEdges }) => {
     const storedAdmins = JSON.parse(localStorage.getItem('admins')) || [];
     setAdmins(storedAdmins);
   }, [data]);
+
+  useEffect(() => {
+    const connections = edges.map(edge => ({
+      source: getNodeLabel(edge.source),
+      target: getNodeLabel(edge.target),
+    }));
+    console.log("Connections:", connections);
+    setConnections(connections);
+  }, [edges, nodes]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -209,7 +217,7 @@ const AdminFlow = ({ data, updateNodes, updateEdges }) => {
               margin="normal"
             />
             <TextField
-              label="Distancia"
+              label="Distancia (km)"
               value={distancia}
               onChange={(e) => setDistancia(e.target.value)}
               fullWidth
@@ -226,7 +234,7 @@ const AdminFlow = ({ data, updateNodes, updateEdges }) => {
                   <TableCell sx={{ fontWeight: 'bold' }}>ID</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Desde</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Hacia</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Distancia</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Distancia (km)</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Acciones</TableCell>
                 </TableRow>
               </TableHead>
