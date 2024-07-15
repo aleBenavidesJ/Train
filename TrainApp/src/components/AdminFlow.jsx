@@ -1,12 +1,16 @@
-import { useState, useEffect } from 'react';
-import { Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, TextField, Button, Box } from '@mui/material';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import {
+  Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+  Paper, TablePagination, TextField, Button, Box, IconButton
+} from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import ReactFlow, { MiniMap, Controls, Background } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-const AdminFlow = ({ data }) => {
-  const [nodes, setNodes] = useState([]);
-  const [edges, setEdges] = useState([]);
+const AdminFlow = ({ data, updateNodes, updateEdges, setConnections }) => {
+  const [nodes, setNodes] = useState(data.nodes);
+  const [edges, setEdges] = useState(data.edges);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -15,25 +19,29 @@ const AdminFlow = ({ data }) => {
   const [distancia, setDistancia] = useState('');
   const [x, setX] = useState('');
   const [y, setY] = useState('');
-  const [nextEdgeId, setNextEdgeId] = useState(1);
-  const [nextNodeId, setNextNodeId] = useState(1);
+  const [nextEdgeId, setNextEdgeId] = useState(edges.length + 1);
+  const [nextNodeId, setNextNodeId] = useState(nodes.length + 1);
+
+  const [cedula, setCedula] = useState('');
+  const [contrasena, setContrasena] = useState('');
+  const [admins, setAdmins] = useState([]);
 
   useEffect(() => {
-    const savedNodes = JSON.parse(localStorage.getItem('nodes')) || data.nodes;
-    const savedEdges = JSON.parse(localStorage.getItem('edges')) || data.edges;
-    setNodes(savedNodes);
-    setEdges(savedEdges);
-    setNextNodeId(savedNodes.length + 1);
-    setNextEdgeId(savedEdges.length + 1);
-  }, [data.nodes, data.edges]);
+    setNodes(data.nodes);
+    setEdges(data.edges);
+
+    const storedAdmins = JSON.parse(localStorage.getItem('admins')) || [];
+    setAdmins(storedAdmins);
+  }, [data]);
 
   useEffect(() => {
-    localStorage.setItem('nodes', JSON.stringify(nodes));
-  }, [nodes]);
-
-  useEffect(() => {
-    localStorage.setItem('edges', JSON.stringify(edges));
-  }, [edges]);
+    const connections = edges.map(edge => ({
+      source: getNodeLabel(edge.source),
+      target: getNodeLabel(edge.target),
+    }));
+    console.log("Connections:", connections);
+    setConnections(connections);
+  }, [edges, nodes]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -68,7 +76,7 @@ const AdminFlow = ({ data }) => {
 
     if (!targetNode) {
       targetNode = {
-        id: (nextNodeId + 1).toString(), 
+        id: (nextNodeId + 1).toString(),
         position: { x: parseFloat(x) + 100, y: parseFloat(y) + 100 },
         data: { label: hacia },
       };
@@ -77,7 +85,7 @@ const AdminFlow = ({ data }) => {
     }
 
     const newEdge = { id: `e${nextEdgeId}`, source: sourceNode.id, target: targetNode.id, distance: distancia };
-    
+
     newEdges.push(newEdge);
     setNextEdgeId(nextEdgeId + 1);
     setNodes(newNodes);
@@ -87,13 +95,68 @@ const AdminFlow = ({ data }) => {
     setDistancia('');
     setX('');
     setY('');
+
+    updateNodes(newNodes);
+    updateEdges(newEdges);
+  };
+
+  const handleEditEdge = (edgeId) => {
+    const edge = edges.find((e) => e.id === edgeId);
+    if (!edge) return;
+
+    const sourceNode = nodes.find((node) => node.id === edge.source);
+    const targetNode = nodes.find((node) => node.id === edge.target);
+
+    setDesde(sourceNode ? sourceNode.data.label : '');
+    setHacia(targetNode ? targetNode.data.label : '');
+    setDistancia(edge.distance);
+  };
+
+  const handleDeleteEdge = (edgeId) => {
+    const newEdges = edges.filter((edge) => edge.id !== edgeId);
+    const edgeToDelete = edges.find((edge) => edge.id === edgeId);
+
+    const sourceNode = nodes.find((node) => node.id === edgeToDelete.source);
+    const targetNode = nodes.find((node) => node.id === edgeToDelete.target);
+
+    const isSourceConnectedToOthers = newEdges.some((e) => e.source === sourceNode.id || e.target === sourceNode.id);
+    const isTargetConnectedToOthers = newEdges.some((e) => e.source === targetNode.id || e.target === targetNode.id);
+
+    const newNodes = nodes.filter((node) => {
+      const isSource = edgeToDelete.source === node.id;
+      const isTarget = edgeToDelete.target === node.id;
+      return !((isSource && !isSourceConnectedToOthers) || (isTarget && !isTargetConnectedToOthers));
+    });
+
+    setEdges(newEdges);
+    setNodes(newNodes);
+    updateNodes(newNodes);
+    updateEdges(newEdges);
+  };
+
+  const handleAddAdmin = () => {
+    if (!cedula || !contrasena) return;
+
+    const newAdmin = { id: admins.length + 1, cedula, contrasena };
+    const updatedAdmins = [...admins, newAdmin];
+    setAdmins(updatedAdmins);
+    localStorage.setItem('admins', JSON.stringify(updatedAdmins));
+
+    setCedula('');
+    setContrasena('');
+  };
+
+  const handleDeleteAdmin = (adminId) => {
+    const updatedAdmins = admins.filter((admin) => admin.id !== adminId);
+    setAdmins(updatedAdmins);
+    localStorage.setItem('admins', JSON.stringify(updatedAdmins));
   };
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, edges.length - page * rowsPerPage);
 
   return (
     <Grid container direction="row" sx={{ height: '100vh' }}>
-      <Grid item xs={25} sx={{ bgcolor: 'white', padding: 2 }}>
+      <Grid item xs={12} sx={{ bgcolor: 'white', padding: 2 }}>
         <Box sx={{ mb: 2 }}>
           <Box sx={{ width: '100%', height: '300px', backgroundColor: '#1B1B1B', mb: 2 }}>
             <ReactFlow
@@ -154,7 +217,7 @@ const AdminFlow = ({ data }) => {
               margin="normal"
             />
             <TextField
-              label="Distancia"
+              label="Distancia (km)"
               value={distancia}
               onChange={(e) => setDistancia(e.target.value)}
               fullWidth
@@ -171,7 +234,8 @@ const AdminFlow = ({ data }) => {
                   <TableCell sx={{ fontWeight: 'bold' }}>ID</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Desde</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Hacia</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Distancia</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Distancia (km)</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Acciones</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -181,11 +245,19 @@ const AdminFlow = ({ data }) => {
                     <TableCell>{getNodeLabel(edge.source)}</TableCell>
                     <TableCell>{getNodeLabel(edge.target)}</TableCell>
                     <TableCell>{edge.distance}</TableCell>
+                    <TableCell>
+                      <IconButton onClick={() => handleEditEdge(edge.id)}>
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton onClick={() => handleDeleteEdge(edge.id)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
                   </TableRow>
                 ))}
                 {emptyRows > 0 && (
                   <TableRow style={{ height: 53 * emptyRows }}>
-                    <TableCell colSpan={4} />
+                    <TableCell colSpan={5} />
                   </TableRow>
                 )}
               </TableBody>
@@ -201,6 +273,53 @@ const AdminFlow = ({ data }) => {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
+        <Box sx={{ mt: 4 }}>
+          <TextField
+            label="Cédula"
+            value={cedula}
+            onChange={(e) => setCedula(e.target.value)}
+            fullWidth
+            margin="normal"
+            type="number"
+          />
+          <TextField
+            label="Contraseña"
+            value={contrasena}
+            onChange={(e) => setContrasena(e.target.value)}
+            fullWidth
+            margin="normal"
+            type="password"
+          />
+          <Button variant="contained" onClick={handleAddAdmin} fullWidth>
+            Agregar Administrador
+          </Button>
+        </Box>
+        <TableContainer component={Paper} sx={{ mt: 4 }}>
+          <Table stickyHeader>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 'bold' }}>ID</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Cédula</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Contraseña</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Acciones</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {admins.map((admin) => (
+                <TableRow key={admin.id}>
+                  <TableCell>{admin.id}</TableCell>
+                  <TableCell>{admin.cedula}</TableCell>
+                  <TableCell>{admin.contrasena}</TableCell>
+                  <TableCell>
+                    <IconButton onClick={() => handleDeleteAdmin(admin.id)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Grid>
     </Grid>
   );

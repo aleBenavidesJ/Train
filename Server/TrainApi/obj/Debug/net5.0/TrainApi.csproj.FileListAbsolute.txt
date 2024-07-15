@@ -1,0 +1,8 @@
+C:\Users\snipe\OneDrive\Desktop\Train\Server\TrainApi\obj\Debug\net5.0\TrainApi.csproj.AssemblyReference.cache
+C:\Users\snipe\OneDrive\Desktop\Train\Server\TrainApi\obj\Debug\net5.0\TrainApi.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\snipe\OneDrive\Desktop\Train\Server\TrainApi\obj\Debug\net5.0\TrainApi.AssemblyInfoInputs.cache
+C:\Users\snipe\OneDrive\Desktop\Train\Server\TrainApi\obj\Debug\net5.0\TrainApi.AssemblyInfo.cs
+C:\Users\snipe\OneDrive\Desktop\Train\Server\TrainApi\obj\Debug\net5.0\TrainApi.csproj.CoreCompileInputs.cache
+C:\Users\snipe\OneDrive\Desktop\Train\Server\TrainApi\obj\Debug\net5.0\TrainApi.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\snipe\OneDrive\Desktop\Train\Server\TrainApi\obj\Debug\net5.0\TrainApi.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\snipe\OneDrive\Desktop\Train\Server\TrainApi\obj\Debug\net5.0\TrainApi.sourcelink.json
